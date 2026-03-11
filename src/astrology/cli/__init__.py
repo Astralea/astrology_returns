@@ -32,6 +32,7 @@ from .returns import sr, lr, lr_year  # noqa: E402
 from .horary import horary  # noqa: E402
 from .transits import transit  # noqa: E402
 from .geo import geo  # noqa: E402
+from .profection import profection  # noqa: E402
 
 cli.add_command(natal)
 cli.add_command(sr)
@@ -40,6 +41,7 @@ cli.add_command(lr_year)
 cli.add_command(horary)
 cli.add_command(transit)
 cli.add_command(geo)
+cli.add_command(profection)
 
 
 def main():
