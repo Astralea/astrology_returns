@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from .aspects import ASPECTS
-from .ephemeris import (
+from ..core.ephemeris import (
     PLANETS,
     find_exact_return,
     get_planet_lon,

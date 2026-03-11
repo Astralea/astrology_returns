@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import swisseph as swe
 
-from .chart import ChartData, calculate_chart_from_jd
-from .ephemeris import (
+from ..core.chart import ChartData, calculate_chart_from_jd
+from ..core.ephemeris import (
     GeoLocation,
     datetime_to_jd,
     find_exact_return,

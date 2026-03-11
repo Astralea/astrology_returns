@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from .aspects import calculate_aspects, is_moon_void_of_course
-from .chart import ChartData
+from ..core.chart import ChartData
 from .dignities import (
     find_receptions,
     get_dignities_for_planet,
