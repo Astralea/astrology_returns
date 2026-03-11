@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from zoneinfo import ZoneInfo
 
 from .ephemeris import (
     GeoLocation,
@@ -31,6 +32,7 @@ class ChartData:
     asc: float
     mc: float
     house_system: str
+    tz: ZoneInfo | None = None
 
     @property
     def datetime_str(self) -> str:
@@ -38,6 +40,14 @@ class ChartData:
         m = int((self.hour_ut - h) * 60)
         s = int(((self.hour_ut - h) * 60 - m) * 60)
         return f"{self.year:04d}-{self.month:02d}-{self.day:02d} {h:02d}:{m:02d}:{s:02d} UT"
+
+    @property
+    def local_datetime_str(self) -> str | None:
+        if self.tz is None:
+            return None
+        from .timezone import ut_to_local, format_local_time
+        local_dt = ut_to_local(self.year, self.month, self.day, self.hour_ut, self.tz)
+        return format_local_time(local_dt)
 
 
 def calculate_chart(

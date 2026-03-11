@@ -77,7 +77,12 @@ def format_chart(chart: ChartData, title: str = "", use_unicode: bool = False, i
         lines.append(f"  {title}")
         lines.append(f"{'=' * 60}")
 
-    lines.append(f"  Time: {chart.datetime_str}")
+    local_str = chart.local_datetime_str
+    if local_str:
+        lines.append(f"  Time: {local_str}")
+        lines.append(f"        {chart.datetime_str}")
+    else:
+        lines.append(f"  Time: {chart.datetime_str}")
     lines.append(f"  Location: {chart.location}")
     lines.append(f"  House System: {chart.house_system.title()}")
     lines.append("")
