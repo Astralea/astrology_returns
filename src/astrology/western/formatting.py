@@ -180,15 +180,15 @@ def format_chart(chart: ChartData, title: str = "", use_unicode: bool = False, i
     }
     receptions = find_receptions(reception_planets, aspect_pairs)
     if receptions:
-        lines.append("  Receptions (互容/接纳):")
+        lines.append("  Receptions:")
         for rec in receptions:
             asp_mark = " ★" if rec.has_aspect else ""
             if rec.rtype.startswith("mutual"):
                 label = {
-                    "mutual_domicile": "互容 domicile",
-                    "mutual_exalt":    "互容 exaltation",
-                    "mutual_mixed":    "互容 mixed",
-                    "mutual_minor":    "互容 minor",
+                    "mutual_domicile": "mutual domicile",
+                    "mutual_exalt":    "mutual exaltation",
+                    "mutual_mixed":    "mutual mixed",
+                    "mutual_minor":    "mutual minor",
                 }.get(rec.rtype, rec.rtype)
                 lines.append(
                     f"    {rec.planet_a:<10} ⟷ {rec.planet_b:<10}"
