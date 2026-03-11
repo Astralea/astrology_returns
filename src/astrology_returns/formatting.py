@@ -58,6 +58,21 @@ def _dignity_flags(planet_name: str, lon: float) -> str:
     return " ".join(flags)
 
 
+def _find_house(lon: float, cusps: list[float]) -> int:
+    """Determine which house (1-12) a planet falls in."""
+    for i in range(12):
+        cusp_start = cusps[i]
+        cusp_end = cusps[(i + 1) % 12]
+        if cusp_start <= cusp_end:
+            if cusp_start <= lon < cusp_end:
+                return i + 1
+        else:
+            # Wraps around 0° Aries
+            if lon >= cusp_start or lon < cusp_end:
+                return i + 1
+    return 12  # fallback
+
+
 def _retrograde_flag(planet_name: str, speeds: dict[str, float]) -> str:
     spd = speeds.get(planet_name, 0.0)
     if spd < 0:
@@ -99,7 +114,7 @@ def format_chart(chart: ChartData, title: str = "", use_unicode: bool = False, i
         lines.append(f"  ⚠ Moon Void of Course ({deg_remaining:.1f}° remaining in sign)")
         lines.append("")
 
-    # Planets with dignities
+    # Planets with dignities and house placement
     lines.append("  Planets:")
     max_name_len = max(len(name) for name in chart.planets)
     for name, lon in chart.planets.items():
@@ -107,9 +122,10 @@ def format_chart(chart: ChartData, title: str = "", use_unicode: bool = False, i
         show_dignity = include_outer or name not in OUTER_PLANETS
         dflags = _dignity_flags(name, lon) if show_dignity else ""
         dstr = f"  [{dflags}]" if dflags else ""
+        house = _find_house(lon, chart.cusps)
         lines.append(
             f"    {name:<{max_name_len}}  {lon_to_sign(lon, use_unicode)}{retro}"
-            f"  ({lon:>8.4f}°){dstr}"
+            f"  ({lon:>8.4f}°)  H{house:<2}{dstr}"
         )
     lines.append("")
 
