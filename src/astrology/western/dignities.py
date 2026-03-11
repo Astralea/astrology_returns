@@ -298,8 +298,8 @@ def find_receptions(
                         f"{pa} in {pb}'s {'+'.join(b_minor)}, {pb} in {pa}'s {'+'.join(a_minor)}",
                     ))
 
-            # --- One-way receptions ---
-            if not mutual_found:
+            # --- One-way receptions (require aspect) ---
+            if not mutual_found and aspected:
                 # pb receives pa
                 _add_one_way(results, pa, pb, pb_digs_at_a, aspected)
                 # pa receives pb
