@@ -2,7 +2,7 @@
 
 CLI tool for calculating Natal charts (本命盘), Solar Returns (日返), Lunar Returns (月返), and Horary charts.
 
-Text output designed for easy copy-paste into chart software (e.g. 宫神星).
+Text output designed for easy copy-paste into language models for fortune-telling (算命).
 
 ## Install
 
