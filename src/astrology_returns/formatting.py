@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from .aspects import calculate_aspects
+from .aspects import calculate_aspects, is_moon_void_of_course
 from .chart import ChartData
 from .dignities import (
     find_receptions,
@@ -87,6 +87,12 @@ def format_chart(chart: ChartData, title: str = "", use_unicode: bool = False, i
     lines.append(f"    ASC  {lon_to_sign(chart.asc, use_unicode)}")
     lines.append(f"    MC   {lon_to_sign(chart.mc, use_unicode)}")
     lines.append("")
+
+    # Moon Void of Course
+    voc, deg_remaining = is_moon_void_of_course(chart.planets, chart.speeds)
+    if voc:
+        lines.append(f"  ⚠ Moon Void of Course ({deg_remaining:.1f}° remaining in sign)")
+        lines.append("")
 
     # Planets with dignities
     lines.append("  Planets:")

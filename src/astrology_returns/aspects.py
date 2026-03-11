@@ -114,3 +114,66 @@ def calculate_aspects(
 
     results.sort(key=lambda a: a.orb)
     return results
+
+
+# Traditional planets for VOC check
+_TRADITIONAL = {"Sun", "Mercury", "Venus", "Mars", "Jupiter", "Saturn"}
+_MAJOR_ANGLES = [0, 60, 90, 120, 180]
+
+
+def is_moon_void_of_course(
+    planets: dict[str, float],
+    speeds: dict[str, float],
+) -> tuple[bool, float]:
+    """
+    Check if the Moon is void of course (no applying major aspects
+    to traditional planets before leaving its current sign).
+
+    Returns:
+        (is_voc, degrees_remaining_in_sign)
+    """
+    moon_lon = planets.get("Moon")
+    moon_speed = speeds.get("Moon")
+    if moon_lon is None or moon_speed is None:
+        return False, 0.0
+
+    sign_end = ((moon_lon // 30) + 1) * 30
+    degrees_remaining = sign_end - moon_lon
+
+    if moon_speed <= 0:
+        # Lunar retrograde is extremely rare; skip VOC check
+        return False, degrees_remaining
+
+    time_to_leave = degrees_remaining / moon_speed  # days
+
+    for name, lon in planets.items():
+        if name == "Moon" or name not in _TRADITIONAL:
+            continue
+
+        planet_speed = speeds.get(name, 0.0)
+        relative_speed = moon_speed - planet_speed
+        if abs(relative_speed) < 1e-10:
+            continue
+
+        # Current angular separation (Moon - planet), normalized to [0, 360)
+        current_sep = (moon_lon - lon) % 360
+
+        for angle in _MAJOR_ANGLES:
+            # Aspect is exact when separation = angle or 360-angle
+            targets = [angle]
+            if 0 < angle < 180:
+                targets.append(360 - angle)
+
+            for target in targets:
+                diff = target - current_sep
+                # Find smallest positive t where current_sep + relative_speed * t ≡ target (mod 360)
+                best_t = None
+                for k in range(-2, 3):
+                    t = (diff + 360 * k) / relative_speed
+                    if t > 1e-10 and (best_t is None or t < best_t):
+                        best_t = t
+
+                if best_t is not None and best_t < time_to_leave:
+                    return False, degrees_remaining
+
+    return True, degrees_remaining
