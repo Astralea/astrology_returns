@@ -33,6 +33,7 @@ class ChartData:
     mc: float
     house_system: str
     tz: ZoneInfo | None = None
+    approximate_time: bool = False  # True when birth time unknown (noon estimate)
 
     @property
     def datetime_str(self) -> str:

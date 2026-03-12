@@ -101,40 +101,46 @@ def format_chart(chart: ChartData, title: str = "", use_unicode: bool = False, i
     else:
         lines.append(f"  Time: {chart.datetime_str}")
     lines.append(f"  Location: {chart.location}")
-    lines.append(f"  House System: {chart.house_system.title()}")
-    lines.append("")
+    approx = getattr(chart, "approximate_time", False)
+    if approx:
+        lines.append("  ⚠ No birth time — using noon estimate. Houses/ASC/MC unreliable.")
+        lines.append("")
+    else:
+        lines.append(f"  House System: {chart.house_system.title()}")
+        lines.append("")
 
-    # Angles
-    lines.append("  Angles:")
-    lines.append(f"    ASC  {lon_to_sign(chart.asc, use_unicode)}")
-    lines.append(f"    MC   {lon_to_sign(chart.mc, use_unicode)}")
-    lines.append("")
+    if not approx:
+        # Angles
+        lines.append("  Angles:")
+        lines.append(f"    ASC  {lon_to_sign(chart.asc, use_unicode)}")
+        lines.append(f"    MC   {lon_to_sign(chart.mc, use_unicode)}")
+        lines.append("")
 
-    # Sect
-    sun_house = _find_house(chart.planets.get("Sun", 0.0), chart.cusps)
-    is_diurnal = sun_house >= 7
-    sect = analyze_sect(chart.planets, chart.cusps, is_diurnal)
-    lines.append(f"  Sect: {'Diurnal' if is_diurnal else 'Nocturnal'}")
-    lines.append(f"    Benefic of sect:      {sect.benefic_of_sect:<10} (helper)")
-    lines.append(f"    Malefic of sect:      {sect.malefic_of_sect:<10} (challenge, manageable)")
-    lines.append(f"    Benefic contra sect:  {sect.benefic_contrary:<10} (less effective)")
-    lines.append(f"    Malefic contra sect:  {sect.malefic_contrary:<10} (most difficult)")
-    lines.append("")
+        # Sect
+        sun_house = _find_house(chart.planets.get("Sun", 0.0), chart.cusps)
+        is_diurnal = sun_house >= 7
+        sect = analyze_sect(chart.planets, chart.cusps, is_diurnal)
+        lines.append(f"  Sect: {'Diurnal' if is_diurnal else 'Nocturnal'}")
+        lines.append(f"    Benefic of sect:      {sect.benefic_of_sect:<10} (helper)")
+        lines.append(f"    Malefic of sect:      {sect.malefic_of_sect:<10} (challenge, manageable)")
+        lines.append(f"    Benefic contra sect:  {sect.benefic_contrary:<10} (less effective)")
+        lines.append(f"    Malefic contra sect:  {sect.malefic_contrary:<10} (most difficult)")
+        lines.append("")
 
-    # Lots (Fortune & Spirit)
-    lots = calculate_lots(chart.asc, chart.planets, is_diurnal)
-    lines.append("  Lots:")
-    for lot in lots:
-        lot_house = _find_house(lot.longitude, chart.cusps)
-        lot_ruler = get_domicile_ruler(lot.longitude)
-        ruler_lon = chart.planets.get(lot_ruler)
-        ruler_house = _find_house(ruler_lon, chart.cusps) if ruler_lon is not None else None
-        ruler_info = f"ruler {lot_ruler} (H{ruler_house})" if ruler_house else f"ruler {lot_ruler}"
-        lines.append(
-            f"    {lot.name:<10} {lon_to_sign(lot.longitude, use_unicode)}"
-            f"  H{lot_house:<2} {ruler_info}  — {lot.description}"
-        )
-    lines.append("")
+        # Lots (Fortune & Spirit)
+        lots = calculate_lots(chart.asc, chart.planets, is_diurnal)
+        lines.append("  Lots:")
+        for lot in lots:
+            lot_house = _find_house(lot.longitude, chart.cusps)
+            lot_ruler = get_domicile_ruler(lot.longitude)
+            ruler_lon = chart.planets.get(lot_ruler)
+            ruler_house = _find_house(ruler_lon, chart.cusps) if ruler_lon is not None else None
+            ruler_info = f"ruler {lot_ruler} (H{ruler_house})" if ruler_house else f"ruler {lot_ruler}"
+            lines.append(
+                f"    {lot.name:<10} {lon_to_sign(lot.longitude, use_unicode)}"
+                f"  H{lot_house:<2} {ruler_info}  — {lot.description}"
+            )
+        lines.append("")
 
     # Moon Void of Course
     voc, deg_remaining = is_moon_void_of_course(chart.planets, chart.speeds)
@@ -150,18 +156,25 @@ def format_chart(chart: ChartData, title: str = "", use_unicode: bool = False, i
         show_dignity = include_outer or name not in OUTER_PLANETS
         dflags = _dignity_flags(name, lon) if show_dignity else ""
         dstr = f"  [{dflags}]" if dflags else ""
-        house = _find_house(lon, chart.cusps)
-        lines.append(
-            f"    {name:<{max_name_len}}  {lon_to_sign(lon, use_unicode)}{retro}"
-            f"  ({lon:>8.4f}°)  H{house:<2}{dstr}"
-        )
+        if approx:
+            lines.append(
+                f"    {name:<{max_name_len}}  {lon_to_sign(lon, use_unicode)}{retro}"
+                f"  ({lon:>8.4f}°){dstr}"
+            )
+        else:
+            house = _find_house(lon, chart.cusps)
+            lines.append(
+                f"    {name:<{max_name_len}}  {lon_to_sign(lon, use_unicode)}{retro}"
+                f"  ({lon:>8.4f}°)  H{house:<2}{dstr}"
+            )
     lines.append("")
 
-    # Houses
-    lines.append("  Houses:")
-    for i, cusp in enumerate(chart.cusps):
-        lines.append(f"    House {i + 1:>2}  {lon_to_sign(cusp, use_unicode)}  ({cusp:>8.4f}°)")
-    lines.append("")
+    if not approx:
+        # Houses
+        lines.append("  Houses:")
+        for i, cusp in enumerate(chart.cusps):
+            lines.append(f"    House {i + 1:>2}  {lon_to_sign(cusp, use_unicode)}  ({cusp:>8.4f}°)")
+        lines.append("")
 
     # Essential Dignities Table (now with triplicity)
     # Exclude outer planets from table unless --modern

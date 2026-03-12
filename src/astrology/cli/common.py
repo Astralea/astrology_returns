@@ -46,8 +46,10 @@ def parse_date(ctx, param, value: str) -> tuple[int, int, int]:
         raise click.BadParameter("Date must be 'YYYY-MM-DD'")
 
 
-def parse_time(ctx, param, value: str) -> float:
+def parse_time(ctx, param, value: str | None) -> float | None:
     """Parse time string like '14:30' to decimal hours."""
+    if value is None:
+        return None
     try:
         parts = value.split(":")
         h = int(parts[0])
