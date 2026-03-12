@@ -11,6 +11,7 @@ from .shishen import get_shishen, get_canggan_with_shishen, SHISHEN_NAMES
 from .relations import analyze_relations
 from .dayun import calculate_dayun_simple, DaYun
 from .liunian import get_liunian, get_liunian_range, LiuNian
+from .transit import analyze_period, format_period, PeriodAnalysis
 
 __all__ = [
     # 核心
@@ -25,4 +26,6 @@ __all__ = [
     # 大运流年
     "calculate_dayun_simple", "DaYun",
     "get_liunian", "get_liunian_range", "LiuNian",
+    # 行运分析
+    "analyze_period", "format_period", "PeriodAnalysis",
 ]

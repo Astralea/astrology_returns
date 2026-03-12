@@ -36,6 +36,7 @@ from .profection import profection  # noqa: E402
 from .firdaria import firdaria  # noqa: E402
 from .forecast import forecast  # noqa: E402
 from .bazi import bazi  # noqa: E402
+from .bazi_period import bazi_period  # noqa: E402
 
 cli.add_command(natal)
 cli.add_command(sr)
@@ -48,6 +49,7 @@ cli.add_command(profection)
 cli.add_command(firdaria)
 cli.add_command(forecast)
 cli.add_command(bazi)
+cli.add_command(bazi_period, name="bazi-period")
 
 
 def main():
