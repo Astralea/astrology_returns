@@ -148,7 +148,12 @@ def forecast(ctx, natal_date, natal_time, year, location, city, house_system, ut
     if fird_ruler not in transit_planets and fird_ruler in PLANETS and fird_ruler not in _SKIP_TRANSIT:
         transit_planets.append(fird_ruler)
 
-    natal_points = dict(natal_chart.planets)
+    # Only track transits to personal points (not outer-to-outer)
+    _OUTER = {"Uranus", "Neptune", "Pluto", "North Node"}
+    natal_points = {
+        name: lon for name, lon in natal_chart.planets.items()
+        if name not in _OUTER
+    }
     natal_points["ASC"] = natal_chart.asc
     natal_points["MC"] = natal_chart.mc
 

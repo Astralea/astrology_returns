@@ -6,6 +6,9 @@ from dataclasses import dataclass
 
 from .aspects import ASPECTS, PLANET_ORBS
 
+# Outer/generational points — aspects between these are meaningless in synastry
+_GENERATIONAL = {"Uranus", "Neptune", "Pluto", "North Node"}
+
 
 @dataclass
 class SynastryAspect:
@@ -36,6 +39,10 @@ def calculate_synastry(
 
     for pa, lon_a in planets_a.items():
         for pb, lon_b in planets_b.items():
+            # Skip generational-to-generational aspects (everyone born nearby has them)
+            if pa in _GENERATIONAL and pb in _GENERATIONAL:
+                continue
+
             diff = abs(lon_a - lon_b)
             if diff > 180:
                 diff = 360 - diff
