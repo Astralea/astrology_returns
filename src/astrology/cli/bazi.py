@@ -23,7 +23,7 @@ from ..chinese.liunian import get_liunian_range
 @location_options
 @click.option("--true-solar/--no-true-solar", default=True, help="使用真太阳时（默认开启）。")
 @click.option("--split-zi", is_flag=True, default=False, help="分早晚子时（默认不分）。")
-@click.option("--sex", type=click.Choice(["male", "female"], case_sensitive=False), 
+@click.option("--gender", type=click.Choice(["male", "female"], case_sensitive=False), 
               default="male", help="性别（用于大运计算）。")
 @click.option("--year-start", type=int, default=None, help="流年起始年份（默认当前年）。")
 @click.option("--year-end", type=int, default=None, help="流年结束年份（默认起始+10）。")
@@ -34,7 +34,7 @@ from ..chinese.liunian import get_liunian_range
 @click.pass_context
 def bazi(
     ctx, date_val, time_val, location, city, 
-    true_solar, split_zi, sex,
+    true_solar, split_zi, gender,
     year_start, year_end,
     compact, relations, dayun, liunian
 ):
@@ -75,7 +75,7 @@ def bazi(
     
     # 大运
     if dayun:
-        is_male = sex == "male"
+        is_male = gender == "male"
         dy_list = calculate_dayun_simple(
             swe.julday(y, m, d, hour),
             bazi_obj.year_pillar.stem_index,
