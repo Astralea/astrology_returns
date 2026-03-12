@@ -34,6 +34,7 @@ from .transits import transit  # noqa: E402
 from .geo import geo  # noqa: E402
 from .profection import profection  # noqa: E402
 from .firdaria import firdaria  # noqa: E402
+from .forecast import forecast  # noqa: E402
 
 cli.add_command(natal)
 cli.add_command(sr)
@@ -44,6 +45,7 @@ cli.add_command(transit)
 cli.add_command(geo)
 cli.add_command(profection)
 cli.add_command(firdaria)
+cli.add_command(forecast)
 
 
 def main():
