@@ -126,15 +126,16 @@ def forecast(ctx, natal_date, natal_time, year, location, city, house_system, ut
     lines.append(format_chart(sr_chart, use_unicode=use_unicode, include_outer=include_outer))
 
     # === Key Transits ===
-    # Always include Jupiter & Saturn, plus the Year Lord if different
-    transit_planets = ["Jupiter", "Saturn"]
+    # Track slow planets (Jupiter+) — inner planet transits are too frequent and slow to scan
+    _SKIP_TRANSIT = {"Sun", "Moon", "Mercury", "Venus", "Mars", "North Node", "Chiron", "South Node"}
+    transit_planets = ["Jupiter", "Saturn", "Uranus", "Neptune", "Pluto"]
     year_lord = prof.lord_of_year
-    if year_lord not in transit_planets and year_lord in PLANETS and year_lord not in ("North Node", "Chiron"):
+    if year_lord not in transit_planets and year_lord in PLANETS and year_lord not in _SKIP_TRANSIT:
         transit_planets.append(year_lord)
 
     # Also add firdaria major ruler if different
     fird_ruler = fird.current_period.ruler
-    if fird_ruler not in transit_planets and fird_ruler in PLANETS and fird_ruler not in ("North Node", "Chiron", "South Node"):
+    if fird_ruler not in transit_planets and fird_ruler in PLANETS and fird_ruler not in _SKIP_TRANSIT:
         transit_planets.append(fird_ruler)
 
     natal_points = dict(natal_chart.planets)
@@ -148,10 +149,10 @@ def forecast(ctx, natal_date, natal_time, year, location, city, house_system, ut
     lines.append("  ▸ Key Transits")
     lines.append(f"{'─' * 60}")
 
-    note_parts = [f"Jupiter, Saturn (default)"]
-    if year_lord in transit_planets and year_lord not in ("Jupiter", "Saturn"):
+    note_parts = ["Jupiter, Saturn, Uranus, Neptune, Pluto"]
+    if year_lord in transit_planets and year_lord not in ("Jupiter", "Saturn", "Uranus", "Neptune", "Pluto"):
         note_parts.append(f"{year_lord} (Year Lord)")
-    if fird_ruler in transit_planets and fird_ruler not in ("Jupiter", "Saturn") and fird_ruler != year_lord:
+    if fird_ruler in transit_planets and fird_ruler not in ("Jupiter", "Saturn", "Uranus", "Neptune", "Pluto") and fird_ruler != year_lord:
         note_parts.append(f"{fird_ruler} (Firdaria ruler)")
     lines.append(f"  Tracking: {', '.join(note_parts)}")
     lines.append("")

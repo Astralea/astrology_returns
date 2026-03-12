@@ -113,7 +113,7 @@ def _scan_crossings(
 
     while search_jd < jd_end:
         try:
-            hit_jd = find_exact_return(search_jd, target_lon, planet_id)
+            hit_jd = find_exact_return(search_jd, target_lon, planet_id, jd_max=jd_end)
         except Exception:
             break
 

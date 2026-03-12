@@ -106,6 +106,7 @@ def find_exact_return(
     planet_id: int,
     max_iter: int = 100,
     precision: float = 1e-8,
+    jd_max: float = 0.0,
 ) -> float:
     """
     Find the next exact Julian Day (>= jd_start) when a planet reaches target longitude.
@@ -120,9 +121,10 @@ def find_exact_return(
         planet_id: Swiss Ephemeris planet ID.
         max_iter: Maximum Newton iterations.
         precision: Required precision in degrees.
+        jd_max: If > 0, stop scanning beyond this Julian Day (returns jd_max + 1 if not found).
 
     Returns:
-        Julian Day of the exact return.
+        Julian Day of the exact return, or jd_max + 1 if not found within window.
     """
     # Determine scan step based on planet's typical speed
     # Moon: ~13°/day -> step ~2 days; Sun: ~1°/day -> step ~10 days
@@ -148,6 +150,9 @@ def find_exact_return(
 
     for _ in range(1000):
         jd_next = jd + step
+        # Early exit if we've passed the search window
+        if jd_max > 0 and jd_next > jd_max:
+            return jd_max + 1
         curr_diff = signed_diff(get_planet_lon(jd_next, planet_id), target_lon)
 
         # Detect zero crossing (sign change) and the planet is moving forward through target
