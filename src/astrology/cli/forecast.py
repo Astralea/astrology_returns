@@ -9,6 +9,7 @@ from .common import (
     location_options, house_system_option, ut_option,
     resolve_location, resolve_time,
 )
+from ..core.timezone import get_timezone
 from ..core.chart import calculate_chart
 from ..core.ephemeris import PLANETS, datetime_to_jd, get_all_planets
 from ..western.profections import annual_profection
@@ -73,13 +74,21 @@ def _format_firdaria_section(result, chart, use_unicode):
 @location_options
 @house_system_option
 @ut_option
+@click.option("--sr-location", default=None, help="Solar return location as 'lat,lon' (default: natal location).")
+@click.option("--sr-city", default=None, help="Solar return city (default: natal location).")
 @click.pass_context
-def forecast(ctx, natal_date, natal_time, year, location, city, house_system, ut):
+def forecast(ctx, natal_date, natal_time, year, location, city, house_system, ut, sr_location, sr_city):
     """Yearly forecast: profection + firdaria + solar return + key transits."""
     loc = resolve_location(location, city)
     ny, nm, nd, natal_hour_ut, tz = resolve_time(natal_date, natal_time, loc, ut)
     use_unicode = ctx.obj["unicode"]
     include_outer = ctx.obj["modern"]
+
+    # Solar return location (defaults to natal location)
+    if sr_city or sr_location:
+        sr_loc = resolve_location(sr_location, sr_city)
+    else:
+        sr_loc = loc
 
     # Natal chart
     natal_chart = calculate_chart(ny, nm, nd, natal_hour_ut, loc, house_system)
@@ -117,9 +126,10 @@ def forecast(ctx, natal_date, natal_time, year, location, city, house_system, ut
     lines.append("")
 
     # === Solar Return ===
-    sr_chart = solar_return(ny, nm, nd, natal_hour_ut, year, loc, house_system)
-    if tz:
-        sr_chart.tz = tz
+    sr_chart = solar_return(ny, nm, nd, natal_hour_ut, year, sr_loc, house_system)
+    sr_tz = get_timezone(sr_loc) if sr_loc != loc else tz
+    if sr_tz:
+        sr_chart.tz = sr_tz
     lines.append(f"{'─' * 60}")
     lines.append("  ▸ Solar Return")
     lines.append(f"{'─' * 60}")
