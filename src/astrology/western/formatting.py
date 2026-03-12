@@ -254,7 +254,7 @@ def format_transits(
         return "\n".join(lines)
 
     lines.append(
-        f"  {'Date/Time':<22} {'Transit':<10} {'Asp':^3} {'Natal':<12} {'Transit°'}"
+        f"  {'Date/Time':<22} {'Transiting':<10} {'Asp':^3} {'Natal Pt':<12} {'Transit°'}"
     )
     lines.append(f"  {'-' * 56}")
 

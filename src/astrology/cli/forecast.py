@@ -156,6 +156,9 @@ def forecast(ctx, natal_date, natal_time, year, location, city, house_system, ut
         note_parts.append(f"{fird_ruler} (Firdaria ruler)")
     lines.append(f"  Tracking: {', '.join(note_parts)}")
     lines.append("")
+    lines.append("  How to read: outer planet (slow, transiting) aspects your natal planet (fixed).")
+    lines.append("  e.g. 'Uranus ☍ Moon' = transiting Uranus opposes your natal Moon position.")
+    lines.append("")
 
     for planet in transit_planets:
         events = find_transits(natal_points, planet, jd_start, jd_end)
