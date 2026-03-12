@@ -254,18 +254,21 @@ def format_transits(
         return "\n".join(lines)
 
     lines.append(
-        f"  {'Date/Time':<22} {'Transiting':<10} {'Asp':^3} {'Natal Pt':<12} {'Transit°'}"
+        f"  {'Date/Time':<22} {'Transiting':<12} {'Asp':^3} {'Natal Pt':<12} {'Transit°'}"
     )
-    lines.append(f"  {'-' * 56}")
+    lines.append(f"  {'-' * 60}")
 
     for ev in events:
+        motion = getattr(ev, "motion_flag", "D")
+        planet_label = f"{ev.transit_planet} {motion}"
         lines.append(
-            f"  {ev.datetime_str:<22} {ev.transit_planet:<10} "
+            f"  {ev.datetime_str:<22} {planet_label:<12} "
             f"{ev.aspect_symbol:^3} {ev.natal_planet:<12} "
             f"{lon_to_sign(ev.transit_lon, use_unicode)}"
         )
 
     lines.append("")
     lines.append(f"  Total: {len(events)} transit events")
+    lines.append("  D = direct, R = retrograde")
     lines.append("")
     return "\n".join(lines)

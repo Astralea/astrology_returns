@@ -150,16 +150,22 @@ def find_exact_return(
 
     for _ in range(1000):
         jd_next = jd + step
-        # Early exit if we've passed the search window
+        # Clamp to search window — still check the last partial interval
+        clamped = False
         if jd_max > 0 and jd_next > jd_max:
-            return jd_max + 1
+            jd_next = jd_max
+            clamped = True
         curr_diff = signed_diff(get_planet_lon(jd_next, planet_id), target_lon)
 
         # Detect zero crossing (sign change) and the planet is moving forward through target
         if prev_diff * curr_diff <= 0 and abs(prev_diff - curr_diff) < 180:
             # Found bracket [jd, jd_next], refine with Newton from midpoint
-            jd_refine = jd + step * abs(prev_diff) / (abs(prev_diff) + abs(curr_diff))
+            actual_step = jd_next - jd
+            jd_refine = jd + actual_step * abs(prev_diff) / (abs(prev_diff) + abs(curr_diff))
             break
+
+        if clamped:
+            return jd_max + 1
 
         jd = jd_next
         prev_diff = curr_diff

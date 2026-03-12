@@ -25,6 +25,7 @@ class TransitEvent:
     aspect_symbol: str
     natal_lon: float
     transit_lon: float
+    is_retrograde: bool = False
 
     @property
     def datetime_str(self) -> str:
@@ -33,6 +34,10 @@ class TransitEvent:
         mm = int((h - hh) * 60)
         ss = int(((h - hh) * 60 - mm) * 60)
         return f"{y:04d}-{m:02d}-{d:02d} {hh:02d}:{mm:02d}:{ss:02d} UT"
+
+    @property
+    def motion_flag(self) -> str:
+        return "R" if self.is_retrograde else "D"
 
 
 def _aspect_target_lons(natal_lon: float, aspect_angle: int) -> list[float]:
@@ -127,6 +132,7 @@ def _scan_crossings(
             diff = 360 - diff
 
         if diff < 0.01:
+            speed_at_hit = get_planet_speed(hit_jd, planet_id)
             events.append(TransitEvent(
                 jd=hit_jd,
                 transit_planet=transit_planet,
@@ -135,15 +141,19 @@ def _scan_crossings(
                 aspect_symbol=symbol,
                 natal_lon=natal_lon,
                 transit_lon=actual_lon,
+                is_retrograde=speed_at_hit < 0,
             ))
 
         # Jump forward — enough to avoid re-finding the same crossing,
-        # small enough to catch retrograde re-crossings
+        # small enough to catch retrograde re-crossings.
+        # Near stations (very slow speed), use smaller jumps.
         speed = abs(get_planet_speed(hit_jd, planet_id))
         if speed > 5:
             jump = 10.0    # Moon
         elif speed > 0.5:
             jump = 15.0    # Sun, Mercury, Venus, Mars
+        elif speed > 0.05:
+            jump = 10.0    # outer planets, normal motion
         else:
-            jump = 30.0    # Jupiter, Saturn, outer planets
+            jump = 5.0     # outer planets near station — jump less to catch re-crossings
         search_jd = hit_jd + jump
