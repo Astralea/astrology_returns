@@ -1,6 +1,6 @@
 # astrology
 
-CLI toolkit for natal charts, solar/lunar returns, transits, profections, firdaria, and more.
+CLI toolkit for natal charts, solar/lunar returns, transits, profections, firdaria, synastry, and more.
 
 Text output designed for copy-paste into language models for interpretation.
 
@@ -64,6 +64,34 @@ uv run astro firdaria --natal-date 1990-01-15 --natal-time 08:00 --year 2026 --c
 ```
 
 Medieval planetary period system. Auto-detects diurnal/nocturnal birth.
+
+### Forecast (yearly overview)
+
+```bash
+uv run astro forecast --natal-date 1990-01-15 --natal-time 08:00 --year 2026 --city "Beijing"
+
+# Solar return calculated for a different city (where you live now)
+uv run astro forecast --natal-date 1990-01-15 --natal-time 08:00 --year 2026 --city "Beijing" --sr-city "Shanghai"
+```
+
+Combines natal chart + annual profection + firdaria + solar return + key transits (Jupiter, Saturn, Uranus, Neptune, Pluto) in one output. Year Lord and firdaria ruler are auto-added to transit tracking. Transit events show D (direct) or R (retrograde).
+
+### Synastry (compatibility)
+
+```bash
+uv run astro synastry \
+    --date-a 1990-01-15 --time-a 08:00 --name-a "Alice" \
+    --date-b 1992-06-20 --time-b 14:30 --name-b "Bob" \
+    --city "Beijing"
+
+# Different birth cities
+uv run astro synastry \
+    --date-a 1990-01-15 --time-a 08:00 --name-a "Alice" \
+    --date-b 1992-06-20 --time-b 14:30 --name-b "Bob" \
+    --city "Beijing" --city-b "Shanghai"
+```
+
+Shows both natal charts and all inter-chart aspects sorted by orb tightness.
 
 ### Transits
 

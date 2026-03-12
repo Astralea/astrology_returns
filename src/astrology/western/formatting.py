@@ -234,6 +234,37 @@ def format_chart(chart: ChartData, title: str = "", use_unicode: bool = False, i
     return "\n".join(lines)
 
 
+def format_synastry(
+    aspects: list,
+    name_a: str = "Person A",
+    name_b: str = "Person B",
+    use_unicode: bool = False,
+) -> str:
+    """Format synastry aspects for display."""
+    lines: list[str] = []
+
+    if not aspects:
+        lines.append("  No inter-chart aspects found.")
+        lines.append("")
+        return "\n".join(lines)
+
+    lines.append(
+        f"  {name_a + ':':<14} {'Asp':^3} {name_b + ':':<14} {'Aspect':<12} {'Orb'}"
+    )
+    lines.append(f"  {'-' * 54}")
+
+    for asp in aspects:
+        lines.append(
+            f"  {asp.planet_a:<14} {asp.symbol:^3} {asp.planet_b:<14} "
+            f"{asp.aspect_name:<12} {asp.orb:>5.2f}°"
+        )
+
+    lines.append("")
+    lines.append(f"  Total: {len(aspects)} inter-chart aspects")
+    lines.append("")
+    return "\n".join(lines)
+
+
 def format_transits(
     events: list,
     title: str = "Transits",
