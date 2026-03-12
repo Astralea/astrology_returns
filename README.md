@@ -12,6 +12,46 @@ uv sync
 
 ## Commands
 
+### Bazi (八字 — Chinese Astrology)
+
+```bash
+# Basic chart
+uv run astro bazi --date 1990-01-15 --time 08:00 --city "Beijing"
+
+# With full analysis
+uv run astro bazi --date 1990-01-15 --time 08:00 --city "Beijing" --relations --dayun --liunian
+
+# Female chart
+uv run astro bazi --date 1990-01-15 --time 08:00 --city "Beijing" --gender female
+```
+
+**Features:**
+- Four pillars (年柱/月柱/日柱/时柱) with solar term-based month pillar
+- True solar time correction (use `--no-true-solar` to disable)
+- ShiShen (十神) analysis
+- Earthly branch relations: 六合, 六冲, 三合, 三会, 刑, 害, 破
+- DaYun (大运) calculation with gender-specific direction
+- LiuNian (流年) lookup
+
+### Bazi Period (行运)
+
+```bash
+# Current period (大运 + 流年 + 流月 + 流日)
+uv run astro bazi-period --natal-date 1990-01-15 --natal-time 08:00 --city "Beijing"
+
+# Specific year
+uv run astro bazi-period --natal-date 1990-01-15 --natal-time 08:00 --city "Beijing" --year 2026
+
+# Compact view
+uv run astro bazi-period --natal-date 1990-01-15 --natal-time 08:00 --city "Beijing" --compact
+```
+
+**Features:**
+- Shows current DaYun (大运) period
+- LiuNian (流年) with branch relations to natal chart
+- LiuYue (流月) and LiuRi (流日) analysis
+- Transit relations (刑冲合害) with original chart
+
 ### Natal Chart
 
 ```bash
@@ -100,6 +140,8 @@ uv run astro --unicode --modern sr --natal-date ...
 
 ## Chart Output
 
+### Western Astrology
+
 Every chart includes:
 
 - **Planets** — position, house placement, retrograde flag (R), dignity/debility markers
@@ -107,6 +149,18 @@ Every chart includes:
 - **Aspects** — major aspects (conjunction, sextile, square, trine, opposition) with orbs, applying/separating
 - **Receptions** — mutual receptions (aspect-free) and one-way receptions (require aspect)
 - **Moon Void of Course** — detection with degrees remaining in sign
+
+### Bazi (八字) Output
+
+Every bazi chart includes:
+
+- **Four Pillars** — year/month/day/hour pillars (年柱/月柱/日柱/时柱)
+- **Day Master** —日主 (Ruling Element of the Day)
+- **ShiShen** — 十神 (Ten Gods) for each stem and branch
+- **Cang Gan** — 藏干 (Hidden Stems) with their ShiShen
+- **Branch Relations** — 六合, 六冲, 三合, 三会, 刑, 害, 破 (when using `--relations`)
+- **DaYun** — 大运 (10-year luck periods) with gender-specific direction
+- **LiuNian** — 流年 (yearly pillars)
 
 ## Notes
 
