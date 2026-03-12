@@ -15,11 +15,11 @@ ASPECTS = {
 
 # Default orbs per planet (wider for luminaries)
 PLANET_ORBS = {
-    "Sun": 10.0,
-    "Moon": 10.0,
+    "Sun": 15.0,
+    "Moon": 12.0,
     "Mercury": 7.0,
     "Venus": 7.0,
-    "Mars": 7.0,
+    "Mars": 8.0,
     "Jupiter": 9.0,
     "Saturn": 9.0,
     "Uranus": 5.0,
