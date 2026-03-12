@@ -10,7 +10,7 @@ from ..core.birth import BirthData
 from ..core.timezone import get_timezone, local_to_ut
 
 
-def resolve_location(location: str | None, city: str | None) -> GeoLocation:
+def resolve_location(location: str | None, city: str | None) -> GeoLocation | None:
     """Resolve location from either --location or --city."""
     if city:
         loc, address = geocode(city)
@@ -20,7 +20,7 @@ def resolve_location(location: str | None, city: str | None) -> GeoLocation:
         return loc
     if location:
         return parse_location_str(location)
-    raise click.UsageError("Provide either --location or --city.")
+    return None
 
 
 def parse_location_str(value: str) -> GeoLocation:
@@ -69,14 +69,15 @@ def resolve_birth(date_tuple, time_hour, loc, ut_flag) -> BirthData:
 def resolve_time(date_tuple, time_hour, loc, ut_flag):
     """Convert input time to UT components (legacy helper).
 
-    Returns (year, month, day, hour_ut, tz).
+    Returns (year, month, day, hour_ut, tz) when ut_flag is True.
+    Returns (year, month, day, hour_local, tz) when ut_flag is False.
     """
     y, m, d = date_tuple
     if ut_flag:
         return y, m, d, time_hour, None
-    tz = get_timezone(loc)
-    uy, um, ud, hour_ut = local_to_ut(y, m, d, time_hour, tz)
-    return uy, um, ud, hour_ut, tz
+    tz = get_timezone(loc) if loc else None
+    # 八字使用本地时间，返回原始输入时间
+    return y, m, d, time_hour, tz
 
 
 # Reusable click option decorators
