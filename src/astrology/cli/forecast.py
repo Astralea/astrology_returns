@@ -125,15 +125,41 @@ def forecast(ctx, natal_date, natal_time, year, location, city, house_system, ut
     lines.append(_format_firdaria_section(fird, natal_chart, use_unicode))
     lines.append("")
 
-    # === Solar Return ===
-    sr_chart = solar_return(ny, nm, nd, natal_hour_ut, year, sr_loc, house_system)
+    # === Solar Returns ===
+    # Show two SRs that cover the forecast year:
+    # prev SR (year-1 birthday → year birthday) covers Jan–birthday
+    # curr SR (year birthday → year+1 birthday) covers birthday–Dec
     sr_tz = get_timezone(sr_loc) if sr_loc != loc else tz
-    if sr_tz:
-        sr_chart.tz = sr_tz
-    lines.append(f"{'─' * 60}")
-    lines.append("  ▸ Solar Return")
-    lines.append(f"{'─' * 60}")
-    lines.append(format_chart(sr_chart, use_unicode=use_unicode, include_outer=include_outer))
+    sr_charts = []
+    for sr_year in (year - 1, year, year + 1):
+        ch = solar_return(ny, nm, nd, natal_hour_ut, sr_year, sr_loc, house_system)
+        if sr_tz:
+            ch.tz = sr_tz
+        sr_charts.append((sr_year, ch))
+
+    # Pair up: (prev, curr) and (curr, next) for validity ranges
+    prev_chart, curr_chart, next_chart = sr_charts[0][1], sr_charts[1][1], sr_charts[2][1]
+    sr_pairs = [
+        (year - 1, prev_chart, curr_chart),
+        (year, curr_chart, next_chart),
+    ]
+
+    for idx, (sr_year, sr_ch, sr_next) in enumerate(sr_pairs):
+        sr_str = sr_ch.local_datetime_str or sr_ch.datetime_str
+        next_sr_str = sr_next.local_datetime_str or sr_next.datetime_str
+        sr_date = sr_str.split()[0]
+        next_sr_date = next_sr_str.split()[0]
+        label = "① before birthday" if idx == 0 else "② after birthday"
+        lines.append(f"{'─' * 60}")
+        lines.append(f"  ▸ Solar Return {sr_year} ({label})")
+        lines.append(f"{'─' * 60}")
+        sr_output = format_chart(sr_ch, use_unicode=use_unicode, include_outer=include_outer)
+        sr_lines = sr_output.split('\n')
+        for i, line in enumerate(sr_lines):
+            if line.startswith('  Time:'):
+                sr_lines.insert(i, f"  Valid: {sr_date} — {next_sr_date}")
+                break
+        lines.append('\n'.join(sr_lines))
 
     # === Key Transits ===
     # Track slow planets (Jupiter+) — inner planet transits are too frequent and slow to scan
