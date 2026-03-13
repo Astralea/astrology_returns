@@ -26,9 +26,24 @@ def sr(ctx, natal_date, natal_time, year, location, city, house_system, ut):
     loc = resolve_location(location, city)
     ny, nm, nd, natal_hour_ut, tz = resolve_time(natal_date, natal_time, loc, ut)
     chart = solar_return(ny, nm, nd, natal_hour_ut, year, loc, house_system)
+    next_chart = solar_return(ny, nm, nd, natal_hour_ut, year + 1, loc, house_system)
     if tz:
         chart.tz = tz
-    click.echo(format_chart(chart, title=f"Solar Return {year}", use_unicode=ctx.obj["unicode"], include_outer=ctx.obj["modern"]))
+        next_chart.tz = tz
+    # Format validity period from local dates
+    sr_str = chart.local_datetime_str or chart.datetime_str
+    next_sr_str = next_chart.local_datetime_str or next_chart.datetime_str
+    # Extract just the date portion (YYYY-MM-DD)
+    sr_date = sr_str.split()[0]
+    next_sr_date = next_sr_str.split()[0]
+    output = format_chart(chart, title=f"Solar Return {year}", use_unicode=ctx.obj["unicode"], include_outer=ctx.obj["modern"])
+    # Insert validity line before the Time line
+    lines = output.split('\n')
+    for i, line in enumerate(lines):
+        if line.startswith('  Time:'):
+            lines.insert(i, f"  Valid: {sr_date} — {next_sr_date}")
+            break
+    click.echo('\n'.join(lines))
 
 
 @click.command()
